@@ -15,16 +15,20 @@ public class SpringBootSecurityApplication {
 	
 	@GetMapping("/")
 	public String welcome() {
-		return ("<h1>Welcome</h1>");
+		return ("<h1>Welcome Anonymous</h1>"+
+				"<br/><a href=\"/user\">user</a>"+
+				"<br/><a href=\"/admin\">admin</a>");
 	}
 
 	@GetMapping("/user")
 	public String user() {
-		return ("<h1>Welcome User</h1>");
+		return ("<h1>Welcome User</h1>"+
+				"<br/><a href=\"/logout\">logout</a>");
 	}
 	
 	@GetMapping("/admin")
 	public String admin() {
-		return ("<h1>Welcome Admin</h1>");
+		return ("<h1>Welcome Admin</h1>"+
+				"<br/><a href=\"/logout\">logout</a>");
 	}
 }
