@@ -15,7 +15,8 @@ public class SpringBootSecurityApplication {
 	
 	@GetMapping("/")
 	public String welcome() {
-		return "Welcome";
+		return ("<h1>Welcome</h1>"+
+				"<br/><a href=\"/logout\">logout</a>");
 	}
 
 }
