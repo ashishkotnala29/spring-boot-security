@@ -2,9 +2,12 @@ package com.ashish.springbootsecurity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -12,29 +15,51 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
+	private UserDetailsService userDetailsService;
+	
+	@Autowired
 	private CustomAuthenticationFailureHandler handler;
+	
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(userDetailsService)
+		.passwordEncoder(new PasswordEncoder() {
+			
+			@Override
+			public boolean matches(CharSequence rawPassword, String encodedPassword) {
+				//Just for Lulz
+				return rawPassword.toString().matches(encodedPassword);
+			}
+			
+			@Override
+			public String encode(CharSequence rawPassword) {
+				return rawPassword.toString();
+			}
+		});
+	}
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests(a -> a
-				.antMatchers("/","/error","/webjars/**").permitAll()
+				.antMatchers("/","/error","/webjars/**",
+						"static/css/**", "static/js/**").permitAll()
 				.anyRequest().authenticated()
+		)
+		.exceptionHandling(e -> e
+				.authenticationEntryPoint(
+						new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
 				)
-				.exceptionHandling(e -> e
-						.authenticationEntryPoint(
-								new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-						)
-				.logout(l -> l
-						.logoutSuccessUrl("/").permitAll()
-						)
-				.csrf(c -> c
-						.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-						)
-				.oauth2Login(o -> o
-						.failureHandler((req, res, ex) -> {
-							req.getSession().setAttribute("error.message", ex.getMessage());
-							handler.onAuthenticationFailure(req, res, ex);
-						})
+		.logout(l -> l
+				.logoutSuccessUrl("/").permitAll()
+				)
+		.csrf(c -> c
+				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+				)
+		.oauth2Login(o -> o
+				.failureHandler((req, res, ex) -> {
+					req.getSession().setAttribute("error.message", ex.getMessage());
+					handler.onAuthenticationFailure(req, res, ex);
+				})
 		);
 	}
 }
