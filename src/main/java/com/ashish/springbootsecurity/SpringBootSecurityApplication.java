@@ -24,7 +24,7 @@ public class SpringBootSecurityApplication {
     public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal) {
         return Collections.singletonMap("name", principal.getAttribute("name"));
     }
-	
+
 	@GetMapping("/error")
 	public String error(HttpServletRequest request) {
 		String message = (String) request.getSession().getAttribute("error.message");
@@ -32,4 +32,8 @@ public class SpringBootSecurityApplication {
 		return message;
 	}
 
+	@GetMapping("/hi")
+	public String sayHi() {
+		return "Hi!";
+	}
 }

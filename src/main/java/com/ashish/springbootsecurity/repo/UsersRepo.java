@@ -1,11 +1,10 @@
 package com.ashish.springbootsecurity.repo;
 
-import java.util.Optional;
-
+import com.ashish.springbootsecurity.models.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.ashish.springbootsecurity.models.Users;
+import java.util.Optional;
 
 @Repository
 public interface UsersRepo extends JpaRepository<Users, Long>{
